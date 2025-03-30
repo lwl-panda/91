@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>美国总统历史长廊</title>
+    <style>
+
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Arial', sans-serif;
+                background: #f0f0f0;
+                min-height: 200vh;
+            }
+
+            /* 主容器 */
+            .container {
+                max-width: 1200px;
+                margin: 0 auto;
+                padding: 40px 20px;
+                position: relative;
+            }
+
+            /* 标题样式 */
+            .main-title {
+                position: relative;
+                font-size: 3.5rem;
+                color: #2c3e50;
+                padding-left: 120px;
+                margin-bottom: 80px;
+                text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            }
+
+            /* 时间轴线 */
+            .timeline {
+                position: absolute;
+                left: 160px;
+                top: 120px;
+                bottom: 0;
+                height: 2900px;
+                bottom: -1500px;
+
+                width: 4px;
+                background: #000;
+                transform-origin: top;
+                animation: lineGrow 2s ease-out forwards;
+            }
+
+            /* 时间点容器 */
+            .president-gallery {
+                position: relative;
+                min-height: 1500px;
+            }
+
+            /* 总统卡片通用样式 */
+            .president-card {
+                position: absolute;
+                width: 280px;
+                left: 240px; /* 所有卡片固定在时间线右侧 */
+                background: white;
+                border-radius: 12px;
+                box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+                padding: 20px;
+                opacity: 0;
+                transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+                cursor: pointer;
+            }
+
+            .president-card:hover {
+                transform: translateY(-10px) scale(1.03);
+                box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+            }
+
+            /* 图片样式 */
+            .president-image {
+                width: 100%;
+                height: 200px;
+                object-fit: cover;
+                border-radius: 8px;
+                margin-bottom: 15px;
+                filter: grayscale(30%);
+                transition: filter 0.3s ease;
+            }
+
+            .president-card:hover .president-image {
+                filter: grayscale(0);
+            }
+
+            /* 文字信息 */
+            .president-info {
+                text-align: center;
+            }
+
+            .president-name {
+                font-size: 1.4rem;
+                color: #34495e;
+                margin-bottom: 8px;
+            }
+
+            .president-term {
+                font-size: 0.9rem;
+                color: #7f8c8d;
+            }
+
+            /* 动画定义 */
+            @keyframes lineGrow {
+                from { transform: scaleY(0); }
+                to { transform: scaleY(1); }
+            }
+
+            /* 响应式设计 - 移动端 */
+            @media (max-width: 768px) {
+                .container {
+                    padding: 20px;
+                }
+
+                .main-title {
+                    font-size: 2.5rem;
+                    padding-left: 40px; /* 与时间线对齐 */
+                    margin-bottom: 60px;
+                }
+
+                .timeline {
+                    left: 40px; /* 时间线向左移动 */
+                    height: 3000px;
+                }
+
+                .president-card {
+                    width: 180px; /* 卡片缩小 */
+                    left: 60px !important; /* 卡片向左移动 */
+                    padding: 12px;
+                }
+
+                .president-image {
+                    height: 150px; /* 图片相应缩小 */
+                }
+
+                .president-name {
+                    font-size: 1.1rem;
+                }
+
+                .president-term {
+                    font-size: 0.8rem;
+                }
+            }
+
+            /* 加载动画 */
+            .show-card {
+                opacity: 1 !important;
+            }
+
+            /* 详细信息弹窗 */
+            .detail-modal {
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 30px;
+                border-radius: 16px;
+                max-width: 600px;
+                width: 90%;
+                z-index: 1000;
+                display: none;
+                box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+            }
+
+            .modal-close {
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                cursor: pointer;
+                font-size: 1.5rem;
+                color: #7f8c8d;
+            }
+
+            .modal-image {
+                width: 100%;
+                height: 300px;
+                object-fit: cover;
+                border-radius: 8px;
+                margin-bottom: 20px;
+            }
+
+            /* 遮罩层 */
+            .overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.6);
+                backdrop-filter: blur(5px);
+                z-index: 999;
+                display: none;
+            }
+
+            /* 性能优化 */
+            .president-card {
+                will-change: transform, opacity;
+            }
+
+            /* 减少动画设置 */
+            @media (prefers-reduced-motion: reduce) {
+                .president-card,
+                .timeline {
+                    animation: none !important;
+                    transition: none !important;
+                }
+            }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="main-title">美国总统</h1>
+        <div class="timeline"></div>
+
+        <div class="president-gallery">
+            <!-- 卡片将通过JavaScript动态生成 -->
+        </div>
+    </div>
+
+    <!-- 弹窗模板 -->
+    <div class="detail-modal">
+        <span class="modal-close">&times;</span>
+        <img class="modal-image" src="" alt="总统照片">
+        <h2 class="president-name"></h2>
+        <p class="president-term"></p>
+        <p class="president-bio"></p>
+    </div>
+    <div class="overlay"></div>
+
+    <script>
+        // 总统数据
+        const presidents = [
+            {
+                name: "林肯",
+                term: "1789-1797",
+                image: "assets/x1.jpg",
+                bio: "美国首任总统，领导美国独立战争胜利..."
+            },
+            {
+                name: "黛杰",
+                term: "2022-2025",
+                image: "assets/x2.png",
+                bio: "米国首任总统间谍时期化名...."
+            },
+            {
+                name: "特种（总）桶",
+                term: "9191-1919",
+                image: "assets/x3.jpg",
+                bio: "米国首任总统军训时的辉煌...."
+            },
+            {
+                name: "羞涩总统",
+                term: "0001-0201",
+                image: "assets/x4.png",
+                bio: "米国总统青少年时期..."
+            },
+            {
+                name: "劳改统",
+                term: "0210-2201",
+                image: "assets/x5.png",
+                bio: "总统劳改时期，差点与世长辞....."
+            },
+            {
+                name: "萝莉统",
+                term: "1121-1301",
+                image: "assets/x6.jpg",
+                bio: "米国总统的第一次....唉..."
+            },
+            {
+                name: "小丑统",
+                term: "2020-3202",
+                image: "assets/x7.jpg",
+                bio: "米国总统叛逆期..."
+            },
+        ];
+
+        // 动态生成卡片
+        const gallery = document.querySelector('.president-gallery');
+        const timelineHeight = 1500; // 时间轴高度
+
+
+
+
+        presidents.forEach((president, index) => {
+            const cardSpacing = 290;
+            const card = document.createElement('div');
+            card.className = 'president-card';
+            card.style.top = `${index * cardSpacing}px`; // 直接使用固定间距
+            card.innerHTML = `
+                <img class="president-image" src="${president.image}" alt="${president.name}">
+                <div class="president-info">
+                    <h3 class="president-name">${president.name}</h3>
+                    <p class="president-term">任期：${president.term}</p>
+                </div>
+            `;
+
+            // 点击事件
+            card.addEventListener('click', () => showDetail(president));
+            gallery.appendChild(card);
+        });
+
+        // 滚动动画触发
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('show-card');
+                }
+            });
+        }, { threshold: 0.3 });
+
+        document.querySelectorAll('.president-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // 弹窗控制
+        const modal = document.querySelector('.detail-modal');
+        const overlay = document.querySelector('.overlay');
+
+        function showDetail(president) {
+            modal.querySelector('.modal-image').src = president.image;
+            modal.querySelector('.president-name').textContent = president.name;
+            modal.querySelector('.president-term').textContent = `任期：${president.term}`;
+            modal.querySelector('.president-bio').textContent = president.bio;
+            modal.style.display = 'block';
+            overlay.style.display = 'block';
+        }
+
+        document.querySelector('.modal-close').addEventListener('click', () => {
+            modal.style.display = 'none';
+            overlay.style.display = 'none';
+        });
+
+        overlay.addEventListener('click', () => {
+            modal.style.display = 'none';
+            overlay.style.display = 'none';
+        });
+
+        // 窗口调整时重新定位
+        window.addEventListener('resize', () => {
+            document.querySelectorAll('.president-card').forEach((card, index) => {
+                card.style.top = `${(timelineHeight / 10) * index + 60}px`;
+            });
+        });
+    </script>
+</body>
+</html>
